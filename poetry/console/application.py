@@ -38,6 +38,8 @@ from .commands.cache import CacheClearCommand
 from .commands.debug import DebugInfoCommand
 from .commands.debug import DebugResolveCommand
 
+from .commands.env import EnvInfoCommand
+
 from .commands.self import SelfUpdateCommand
 
 
@@ -131,6 +133,9 @@ class Application(BaseApplication):
 
         # Debug commands
         commands += [DebugInfoCommand(), DebugResolveCommand()]
+
+        # Env commands
+        commands += [EnvInfoCommand()]
 
         # Self commands
         commands += [SelfUpdateCommand()]

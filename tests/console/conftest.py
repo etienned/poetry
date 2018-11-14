@@ -17,7 +17,6 @@ from poetry.packages import Locker as BaseLocker
 from poetry.repositories import Pool
 from poetry.repositories import Repository
 from poetry.utils._compat import Path
-from poetry.utils.env import Env
 from poetry.utils.env import MockEnv
 from poetry.utils.toml_file import TomlFile
 

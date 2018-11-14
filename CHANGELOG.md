@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Added a `env:info` command to get basic information about the current environment.
+
 ### Changed
 
 - Slightly changed the lock file, making it potentially incompatible with previous Poetry versions.
