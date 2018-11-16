@@ -80,7 +80,7 @@ def test_search_for_vcs_setup_egg_info_with_extras(provider):
 
 @pytest.mark.skipif(not PY35, reason="AST parsing does not work for Python <3.4")
 def test_search_for_vcs_read_setup(provider, mocker):
-    mocker.patch("poetry.utils.env.Env.get", return_value=MockEnv())
+    mocker.patch("poetry.utils.env.EnvManager.get", return_value=MockEnv())
 
     dependency = VCSDependency("demo", "git", "https://github.com/demo/demo.git")
 
@@ -97,7 +97,7 @@ def test_search_for_vcs_read_setup(provider, mocker):
 
 @pytest.mark.skipif(not PY35, reason="AST parsing does not work for Python <3.4")
 def test_search_for_vcs_read_setup_with_extras(provider, mocker):
-    mocker.patch("poetry.utils.env.Env.get", return_value=MockEnv())
+    mocker.patch("poetry.utils.env.EnvManager.get", return_value=MockEnv())
 
     dependency = VCSDependency("demo", "git", "https://github.com/demo/demo.git")
     dependency.extras.append("foo")
@@ -117,7 +117,7 @@ def test_search_for_vcs_read_setup_with_extras(provider, mocker):
 
 
 def test_search_for_vcs_read_setup_raises_error_if_no_version(provider, mocker):
-    mocker.patch("poetry.utils.env.Env.get", return_value=MockEnv())
+    mocker.patch("poetry.utils.env.EnvManager.get", return_value=MockEnv())
 
     dependency = VCSDependency("demo", "git", "https://github.com/demo/no-version.git")
 
@@ -175,7 +175,7 @@ def test_search_for_directory_setup_egg_info_with_extras(provider):
 
 @pytest.mark.skipif(not PY35, reason="AST parsing does not work for Python <3.4")
 def test_search_for_directory_setup_read_setup(provider, mocker):
-    mocker.patch("poetry.utils.env.Env.get", return_value=MockEnv())
+    mocker.patch("poetry.utils.env.EnvManager.get", return_value=MockEnv())
 
     dependency = DirectoryDependency(
         "demo",
@@ -200,7 +200,7 @@ def test_search_for_directory_setup_read_setup(provider, mocker):
 
 @pytest.mark.skipif(not PY35, reason="AST parsing does not work for Python <3.4")
 def test_search_for_directory_setup_read_setup_with_extras(provider, mocker):
-    mocker.patch("poetry.utils.env.Env.get", return_value=MockEnv())
+    mocker.patch("poetry.utils.env.EnvManager.get", return_value=MockEnv())
 
     dependency = DirectoryDependency(
         "demo",

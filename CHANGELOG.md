@@ -5,6 +5,7 @@
 ### Added
 
 - Added a `env:info` command to get basic information about the current environment.
+- Added a `env:use` to control the Python version used by the project.
 
 ### Changed
 
