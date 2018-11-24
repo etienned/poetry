@@ -10,6 +10,7 @@
 ### Changed
 
 - Slightly changed the lock file, making it potentially incompatible with previous Poetry versions.
+- Changed the way virtualenvs are stored (names now dependent of the project's path).
 
 ### Fixed
 

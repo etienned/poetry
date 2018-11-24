@@ -16,12 +16,10 @@ class EnvUseCommand(Command):
         manager = EnvManager(poetry.config)
 
         if self.argument("python") == "system":
-            manager.deactivate(self.output, cwd=poetry.file.parent)
+            manager.deactivate(poetry.file.parent, self.output)
 
             return
 
-        env = manager.activate(
-            self.argument("python"), self.output, cwd=poetry.file.parent
-        )
+        env = manager.activate(self.argument("python"), poetry.file.parent, self.output)
 
         self.line("Using virtualenv: <comment>{}</>".format(env.path))

@@ -1,6 +1,9 @@
+import base64
+import hashlib
 import json
 import os
 import platform
+import re
 import shutil
 import subprocess
 import sys
@@ -173,9 +176,10 @@ class EnvManager(object):
 
         create = False
         envs = tomlkit.document()
+        base_env_name = self.generate_env_name(cwd.name, str(cwd))
         if envs_file.exists():
             envs = envs_file.read()
-            current_env = envs.get(cwd.name)
+            current_env = envs.get(base_env_name)
             if current_env is not None:
                 current_minor = current_env["minor"]
                 current_patch = current_env["patch"]
@@ -187,9 +191,7 @@ class EnvManager(object):
                     # We need to recreate
                     create = True
 
-        name = cwd.name
-        name = "{}-py{}".format(name, minor)
-
+        name = "{}-py{}".format(base_env_name, minor)
         venv = venv_path / name
 
         # Create if needed
@@ -197,7 +199,7 @@ class EnvManager(object):
             self.create_venv(cwd, io, executable=python, force=create)
 
         # Activate
-        envs[cwd.name] = {"minor": minor, "patch": patch}
+        envs[base_env_name] = {"minor": minor, "patch": patch}
         envs_file.write(envs)
 
         return self.get(cwd, reload=True)
@@ -210,18 +212,19 @@ class EnvManager(object):
             venv_path = Path(venv_path)
 
         name = cwd.name
+        name = self.generate_env_name(name, str(cwd))
 
         envs_file = TomlFile(venv_path / self.ENVS_FILE)
         if envs_file.exists():
             envs = envs_file.read()
-            env = envs.get(cwd.name)
+            env = envs.get(name)
             if env is not None:
                 io.writeln(
                     "Deactivating virtualenv: <comment>{}</comment>".format(
                         venv_path / (name + "-py{}".format(env["minor"]))
                     )
                 )
-                del envs[cwd.name]
+                del envs[name]
 
                 envs_file.write(envs)
 
@@ -239,9 +242,10 @@ class EnvManager(object):
 
         envs_file = TomlFile(venv_path / self.ENVS_FILE)
         env = None
+        base_env_name = self.generate_env_name(cwd.name, str(cwd))
         if envs_file.exists():
             envs = envs_file.read()
-            env = envs.get(cwd.name)
+            env = envs.get(base_env_name)
             if env:
                 python_minor = env["minor"]
 
@@ -266,8 +270,7 @@ class EnvManager(object):
             else:
                 venv_path = Path(venv_path)
 
-            name = cwd.name
-            name = "{}-py{}".format(name, python_minor)
+            name = "{}-py{}".format(base_env_name, python_minor.strip())
 
             venv = venv_path / name
 
@@ -325,11 +328,11 @@ class EnvManager(object):
                 )
             )
 
-        name = "{}-py{}".format(name, python_minor.strip())
-
         if root_venv:
             venv = venv_path
         else:
+            name = self.generate_env_name(name, str(cwd))
+            name = "{}-py{}".format(name, python_minor.strip())
             venv = venv_path / name
 
         if not venv.exists():
@@ -414,6 +417,15 @@ class EnvManager(object):
             return sys.base_prefix
 
         return sys.prefix
+
+    @classmethod
+    def generate_env_name(cls, name, cwd):  # type: (str, str) -> str
+        name = name.lower()
+        sanitized_name = re.sub(r'[ $`!*@"\\\r\n\t]', "_", name)[:42]
+        h = hashlib.sha256(encode(cwd)).digest()
+        h = base64.urlsafe_b64encode(h).decode()[:8]
+
+        return "{}-{}".format(sanitized_name, h)
 
 
 class Env(object):
