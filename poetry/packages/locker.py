@@ -1,4 +1,5 @@
 import json
+import re
 
 import poetry.packages
 import poetry.repositories
@@ -7,6 +8,7 @@ from hashlib import sha256
 from tomlkit import document
 from typing import List
 
+from poetry.packages import export_requirements
 from poetry.utils._compat import Path
 from poetry.utils.toml_file import TomlFile
 from poetry.version.markers import parse_marker
@@ -161,6 +163,22 @@ class Locker:
             raise RuntimeError("Inconsistent lock file data.")
 
         self._lock_data = None
+
+        self._update_requirements_files()
+
+    def _update_requirements_files(self):
+        for requirements in ("requirements.txt", "requirements-dev.txt"):
+            path = self.lock.parent / requirements
+            if path.is_file():
+                try:
+                    data = path.read_text()
+                except OSError:
+                    continue
+                dev = "dev" in requirements
+                # if match without hash and match with hash
+                tag = not re.search("\+[^@\n]+@[\da-f]{40}", data)
+                egg = "#egg=" in data
+                export_requirements(self, path, dev, tag, egg)
 
     def _get_content_hash(self):  # type: () -> str
         """
